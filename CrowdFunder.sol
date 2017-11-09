@@ -63,8 +63,35 @@ contract  CrowdFunder {
 		totalRaised += msg.value;
 		currentBalance = totalRaised;
 
-		
-
+		checkIfFundingCompleteOrExpired();
+		return contributions.length -1; 
 	}
+
+	function checkIfFundingCompleteOrExpired () {
+
+		if(totalRaised > minimunToRaise){
+
+			state = State.Succesful;
+			payOut();
+
+		} else if (now > raiseBy){
+
+			state = State.ExpiredRefund;
+
+		}
+
+		completeAt = now;
+		
+	}
+	
+	function payOut() public inState(State.Succesful) {
+
+		if(!fundRecipient.send(this.balance)){ throw ;}
+		state = State.Closed;
+		currentBalance = 0;
+		
+	}
+	
+
 
 }
