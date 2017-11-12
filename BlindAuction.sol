@@ -43,6 +43,31 @@ contract BlindAuction {
             deposit: msg.value
         }));
     }
+
+
+        function reveal(uint[] _values, bool[] _fake, bytes32 _secret) onlyBefore(biddingEnd) onlyAfter(revelEnd) {
+        
+        uint length = bids[msg.sender].length;
+        require(_values.length == length);
+        require(_fake.length == length);
+        require(_secret.length == length);
+        
+        
+        uint refund;
+        for(uint i = 0; i <length; i++){
+            var (value,fake,secret) = (_values[i], _fake[i], _secret[i]);
+            var bid = bids[msg.sender][i];
+            if(bid.blindedBid != keccak256(value,fake, secret)){
+                continue;
+            }
+            refund += bid.deposit;
+            if(!fake && bid.deposit >= value){
+                //another function needs to be palce - placeBid
+            }
+        }
+    }
+
+    
     
     
     
