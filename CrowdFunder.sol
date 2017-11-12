@@ -92,6 +92,24 @@ contract  CrowdFunder {
 		
 	}
 	
+	function getRefund(uint256 id) public inState(State.ExpiredRefund) returns (bool){
+
+		if(contributions.length <= id || id < 0 || contributions[id].amount == 0){
+			throw;
+		}
+
+		uint amountToRefund = contributions[id].amount;
+		contributions[id].amount = 0;
+
+		if(!contributions[id].contributor[id].send(amountToRefund)){
+			contributions[id].amount = amountToRefund;
+			return false;
+		} else {
+			totalRaised -= amountToRefund;
+			currentBalance = totalRaised;
+		}
+		return true;
+	}
 
 
 }
